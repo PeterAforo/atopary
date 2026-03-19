@@ -8,6 +8,7 @@ import {
   Car, Calendar, Upload, Plus, X, Loader2, CheckCircle,
   Image as ImageIcon,
 } from "lucide-react";
+import { UploadDropzone } from "@/lib/uploadthing";
 
 const propertyTypes = [
   { label: "House", value: "HOUSE" },
@@ -323,38 +324,84 @@ export default function NewPropertyPage() {
             <h3 className="text-lg font-bold text-secondary flex items-center gap-2">
               <ImageIcon className="w-5 h-5 text-primary" /> Property Images
             </h3>
-            <p className="text-sm text-muted-foreground">Add image URLs for your property. The first image will be the primary image.</p>
-            {imageUrls.map((url, index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => {
-                    const newUrls = [...imageUrls];
-                    newUrls[index] = e.target.value;
-                    setImageUrls(newUrls);
-                  }}
-                  placeholder="https://example.com/image.jpg"
-                  className="flex-1 px-4 py-3 bg-muted border border-border rounded-xl text-sm"
-                />
-                {imageUrls.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setImageUrls(imageUrls.filter((_, i) => i !== index))}
-                    className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
+            <p className="text-sm text-muted-foreground">Upload images or add image URLs. The first image will be the primary image.</p>
+
+            {/* Upload Dropzone */}
+            <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 hover:border-primary/50 transition-colors">
+              <UploadDropzone
+                endpoint="propertyImage"
+                onClientUploadComplete={(res) => {
+                  if (res) {
+                    const newUrls = res.map((file) => file.ufsUrl);
+                    setImageUrls((prev) => [...prev.filter((u) => u.trim()), ...newUrls]);
+                  }
+                }}
+                onUploadError={(error: Error) => {
+                  setError(`Upload failed: ${error.message}`);
+                }}
+              />
+            </div>
+
+            {/* Uploaded & URL images */}
+            {imageUrls.filter((u) => u.trim()).length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {imageUrls.filter((u) => u.trim()).map((url, index) => (
+                  <div key={index} className="relative group">
+                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                      <img src={url} alt={`Property ${index + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                    {index === 0 && (
+                      <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-primary text-white text-xs rounded">Primary</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setImageUrls(imageUrls.filter((_, i) => i !== index))}
+                      className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setImageUrls([...imageUrls, ""])}
-              className="flex items-center gap-2 text-sm text-primary hover:underline"
-            >
-              <Plus className="w-4 h-4" /> Add another image
-            </button>
+            )}
+
+            {/* Manual URL input */}
+            <details className="text-sm">
+              <summary className="text-muted-foreground cursor-pointer hover:text-primary">Or add image URLs manually</summary>
+              <div className="mt-3 space-y-2">
+                {imageUrls.map((url, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => {
+                        const newUrls = [...imageUrls];
+                        newUrls[index] = e.target.value;
+                        setImageUrls(newUrls);
+                      }}
+                      placeholder="https://example.com/image.jpg"
+                      className="flex-1 px-4 py-3 bg-muted border border-border rounded-xl text-sm"
+                    />
+                    {imageUrls.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setImageUrls(imageUrls.filter((_, i) => i !== index))}
+                        className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setImageUrls([...imageUrls, ""])}
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <Plus className="w-4 h-4" /> Add another image URL
+                </button>
+              </div>
+            </details>
           </div>
 
           {/* Videos & Virtual Tour */}

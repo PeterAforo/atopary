@@ -18,6 +18,14 @@ export const metadata: Metadata = {
   description:
     "Discover luxury properties, homes, and commercial spaces across Ghana. Atopary Properties - Your trusted real estate partner.",
   keywords: "real estate, properties, Ghana, homes, luxury, buy, sell, rent",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: "/apple-icon.svg",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

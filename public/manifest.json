@@ -1,0 +1,17 @@
+{
+  "name": "Atopary Properties",
+  "short_name": "Atopary",
+  "description": "Premium Real Estate in Ghana",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#C41E24",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
