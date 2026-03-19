@@ -317,7 +317,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="text"
                     value={applicationData.fullName}
                     onChange={(e) => setApplicationData({ ...applicationData, fullName: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -326,7 +326,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="email"
                     value={applicationData.email}
                     onChange={(e) => setApplicationData({ ...applicationData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -335,7 +335,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="tel"
                     value={applicationData.phone}
                     onChange={(e) => setApplicationData({ ...applicationData, phone: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -344,7 +344,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="date"
                     value={applicationData.dateOfBirth}
                     onChange={(e) => setApplicationData({ ...applicationData, dateOfBirth: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -353,7 +353,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="text"
                     value={applicationData.nationalId}
                     onChange={(e) => setApplicationData({ ...applicationData, nationalId: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -362,7 +362,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="text"
                     value={applicationData.address}
                     onChange={(e) => setApplicationData({ ...applicationData, address: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -371,7 +371,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="text"
                     value={applicationData.employerName}
                     onChange={(e) => setApplicationData({ ...applicationData, employerName: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -380,7 +380,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="text"
                     value={applicationData.jobTitle}
                     onChange={(e) => setApplicationData({ ...applicationData, jobTitle: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
                 <div>
@@ -389,7 +389,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                     type="number"
                     value={applicationData.employmentYears}
                     onChange={(e) => setApplicationData({ ...applicationData, employmentYears: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm"
                   />
                 </div>
               </div>
@@ -400,7 +400,7 @@ export default function MortgageCalculator({ propertyPrice, propertyId }: Mortga
                   value={applicationData.notes}
                   onChange={(e) => setApplicationData({ ...applicationData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm resize-none"
+                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm resize-none"
                 />
               </div>
 

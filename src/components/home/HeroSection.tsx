@@ -144,12 +144,12 @@ export default function HeroSection() {
           {/* Title */}
           <h1 ref={titleRef} className="space-y-2">
             <div className="hero-title-line overflow-hidden">
-              <span className="block text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight">
+              <span className="block text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight">
                 Discover Your
               </span>
             </div>
             <div className="hero-title-line overflow-hidden">
-              <span className="block text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
+              <span className="block text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight">
                 <span className="text-primary">Perfect</span>{" "}
                 <span className="text-white">Property</span>
               </span>
@@ -176,10 +176,10 @@ export default function HeroSection() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 min-w-[160px]">
+              <div className="relative flex items-center gap-2 bg-white rounded-xl px-4 py-3 min-w-[160px]">
                 <Building2 className="w-5 h-5 text-gray-400" />
                 <select
-                  className="w-full bg-transparent text-secondary text-sm focus:outline-none appearance-none cursor-pointer"
+                  className="w-full bg-transparent text-secondary text-sm focus:outline-none appearance-none cursor-pointer pr-6"
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                 >
@@ -189,6 +189,7 @@ export default function HeroSection() {
                     </option>
                   ))}
                 </select>
+                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-4 pointer-events-none" />
               </div>
               <Link
                 href={`/properties?search=${searchQuery}&type=${selectedType}`}

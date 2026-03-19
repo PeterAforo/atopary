@@ -71,13 +71,13 @@ export default function HowItWorks() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-secondary text-white overflow-hidden">
+    <section ref={sectionRef} className="py-16 lg:py-24 bg-secondary text-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 bg-primary/20 text-primary-light text-sm font-semibold rounded-full mb-4">
             How It Works
           </span>
-          <h2 className="text-4xl lg:text-5xl font-bold">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
             Simple Steps to Your{" "}
             <span className="text-primary">Dream Property</span>
           </h2>

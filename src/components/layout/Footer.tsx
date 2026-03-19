@@ -41,10 +41,10 @@ export default function Footer() {
     <footer className="bg-secondary text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* CTA Section */}
-        <div className="py-16 border-b border-white/10">
+        <div className="py-12 lg:py-16 border-b border-white/10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div>
-              <h2 className="text-3xl lg:text-4xl font-bold">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
                 Ready to Find Your{" "}
                 <span className="text-primary">Dream Home?</span>
               </h2>
@@ -52,21 +52,21 @@ export default function Footer() {
                 Let us help you navigate the real estate market with confidence.
               </p>
             </div>
-            <div className="flex gap-4">
-              <Link href="/properties">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Link href="/properties" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all shadow-lg shadow-primary/30"
+                  className="w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all shadow-lg shadow-primary/30"
                 >
                   Browse Properties
                 </motion.button>
               </Link>
-              <Link href="/auth/register?role=SELLER">
+              <Link href="/auth/register?role=SELLER" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
+                  className="w-full sm:w-auto px-8 py-4 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
                 >
                   List Property
                 </motion.button>
@@ -179,7 +179,7 @@ export default function Footer() {
                 key={index}
                 href="#"
                 whileHover={{ scale: 1.1, y: -2 }}
-                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:bg-primary hover:text-white transition-all"
+                className="w-11 h-11 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:bg-primary hover:text-white transition-all"
               >
                 <Icon className="w-4 h-4" />
               </motion.a>

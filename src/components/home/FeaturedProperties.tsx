@@ -84,14 +84,14 @@ export default function FeaturedProperties() {
   }, [loading, properties]);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-white">
+    <section ref={sectionRef} className="py-16 lg:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="featured-header text-center mb-16">
           <motion.span className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4">
             Featured Listings
           </motion.span>
-          <h2 className="text-4xl lg:text-5xl font-bold text-secondary">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary">
             Discover Premium{" "}
             <span className="text-gradient">Properties</span>
           </h2>
@@ -174,7 +174,7 @@ export default function FeaturedProperties() {
                     </div>
 
                     {/* Features */}
-                    <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-4 sm:gap-6 mt-4 pt-4 border-t border-gray-100">
                       {property.bedrooms > 0 && (
                         <div className="flex items-center gap-1.5">
                           <Bed className="w-4 h-4 text-primary" />

@@ -196,12 +196,12 @@ export default function PropertyDetailPage() {
                     <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-lg">Furnished</span>
                   )}
                 </div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-secondary">{property.title}</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary">{property.title}</h1>
                 <div className="flex items-center gap-2 mt-3 text-muted-foreground">
                   <MapPin className="w-5 h-5 text-primary" />
                   <span>{property.address}, {property.city}, {property.state}, {property.country}</span>
                 </div>
-                <div className="mt-4 text-4xl font-bold text-primary">{formatCurrency(property.price)}</div>
+                <div className="mt-4 text-3xl sm:text-4xl font-bold text-primary">{formatCurrency(property.price)}</div>
               </motion.div>
 
               {/* Key Details */}
@@ -209,7 +209,7 @@ export default function PropertyDetailPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+                className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
               >
                 {[
                   { icon: Bed, label: "Bedrooms", value: property.bedrooms },
@@ -254,7 +254,7 @@ export default function PropertyDetailPage() {
               {property.virtualTour && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                   <h2 className="text-2xl font-bold text-secondary mb-4">Virtual Tour</h2>
-                  <div className="relative h-[400px] rounded-2xl overflow-hidden bg-secondary">
+                  <div className="relative h-[250px] sm:h-[350px] lg:h-[400px] rounded-2xl overflow-hidden bg-secondary">
                     <iframe
                       src={property.virtualTour}
                       className="w-full h-full"
@@ -375,10 +375,10 @@ export default function PropertyDetailPage() {
 
                 {/* Quick Actions */}
                 <div className="mt-6 pt-6 border-t border-gray-100 flex gap-3">
-                  <button className="flex-1 py-2 bg-muted rounded-lg text-sm text-muted-foreground hover:bg-gray-200 transition-colors flex items-center justify-center gap-1">
+                  <button className="flex-1 py-2.5 bg-muted rounded-lg text-sm text-muted-foreground hover:bg-gray-200 transition-colors flex items-center justify-center gap-1">
                     <Heart className="w-4 h-4" /> Save
                   </button>
-                  <button className="flex-1 py-2 bg-muted rounded-lg text-sm text-muted-foreground hover:bg-gray-200 transition-colors flex items-center justify-center gap-1">
+                  <button className="flex-1 py-2.5 bg-muted rounded-lg text-sm text-muted-foreground hover:bg-gray-200 transition-colors flex items-center justify-center gap-1">
                     <Share2 className="w-4 h-4" /> Share
                   </button>
                 </div>

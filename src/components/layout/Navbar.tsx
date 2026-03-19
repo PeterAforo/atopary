@@ -216,7 +216,7 @@ export default function Navbar() {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className={`lg:hidden p-2 rounded-lg ${
+            className={`lg:hidden p-2.5 rounded-lg ${
               isScrolled ? "text-secondary" : "text-white"
             }`}
           >

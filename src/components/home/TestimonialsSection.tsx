@@ -80,13 +80,13 @@ export default function TestimonialsSection() {
   }, [testimonials]);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-white">
+    <section ref={sectionRef} className="py-16 lg:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4">
             Testimonials
           </span>
-          <h2 className="text-4xl lg:text-5xl font-bold text-secondary">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary">
             What Our Clients <span className="text-gradient">Say</span>
           </h2>
         </div>

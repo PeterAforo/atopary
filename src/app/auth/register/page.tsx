@@ -69,7 +69,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-[100dvh] flex">
       {/* Left - Image */}
       <div className="hidden lg:block flex-1 relative">
         <div
