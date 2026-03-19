@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { calculateMortgage } from "@/lib/utils";
+import logger from "@/lib/logger";
 
 export async function GET(request: Request) {
   try {
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    console.error("Mortgage fetch error:", error);
+    logger.error("Mortgage fetch error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(application, { status: 201 });
   } catch (error: any) {
-    console.error("Mortgage application error:", error);
+    logger.error("Mortgage application error:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

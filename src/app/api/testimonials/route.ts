@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -10,7 +11,7 @@ export async function GET() {
 
     return NextResponse.json(testimonials);
   } catch (error) {
-    console.error("Testimonials fetch error:", error);
+    logger.error("Testimonials fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

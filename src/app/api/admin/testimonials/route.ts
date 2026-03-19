@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
 
     return NextResponse.json(testimonials);
   } catch (error) {
-    console.error("Testimonials fetch error:", error);
+    logger.error("Testimonials fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(testimonial, { status: 201 });
   } catch (error) {
-    console.error("Testimonial create error:", error);
+    logger.error("Testimonial create error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

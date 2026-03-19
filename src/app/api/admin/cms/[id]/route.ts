@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function PUT(
   request: Request,
@@ -31,7 +32,7 @@ export async function PUT(
 
     return NextResponse.json(page);
   } catch (error) {
-    console.error("CMS page update error:", error);
+    logger.error("CMS page update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -50,7 +51,7 @@ export async function DELETE(
     await prisma.cMSPage.delete({ where: { id } });
     return NextResponse.json({ message: "Page deleted" });
   } catch (error) {
-    console.error("CMS page delete error:", error);
+    logger.error("CMS page delete error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

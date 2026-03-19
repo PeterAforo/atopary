@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/db";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
+import logger from "@/lib/logger";
 
 export async function POST(request: Request) {
   try {
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: "Password reset successfully" });
   } catch (error) {
-    console.error("Reset password error:", error);
+    logger.error("Reset password error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/db";
 import { registerSchema } from "@/lib/validations";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
+import logger from "@/lib/logger";
 
 export async function POST(request: Request) {
   try {
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    console.error("Registration error:", error);
+    logger.error("Registration error", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { sanitizeText } from "@/lib/sanitize";
+import logger from "@/lib/logger";
 
 export async function GET(request: Request) {
   try {
@@ -48,7 +49,7 @@ export async function GET(request: Request) {
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    console.error("Inquiries fetch error:", error);
+    logger.error("Inquiries fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(inquiry, { status: 201 });
   } catch (error) {
-    console.error("Inquiry creation error:", error);
+    logger.error("Inquiry creation error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function PUT(
   request: Request,
@@ -28,7 +29,7 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("User update error:", error);
+    logger.error("User update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -51,7 +52,7 @@ export async function DELETE(
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ message: "User deleted" });
   } catch (error) {
-    console.error("User delete error:", error);
+    logger.error("User delete error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

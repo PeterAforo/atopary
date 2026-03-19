@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import prisma from "@/lib/db";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
+import logger from "@/lib/logger";
 
 export async function POST(request: Request) {
   try {
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
       message: "If an account with that email exists, a reset link has been generated.",
     });
   } catch (error) {
-    console.error("Forgot password error:", error);
+    logger.error("Forgot password error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

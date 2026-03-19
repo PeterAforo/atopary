@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { contactSchema } from "@/lib/validations";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 import { sanitizeObject } from "@/lib/sanitize";
+import logger from "@/lib/logger";
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     if (error.name === "ZodError") {
       return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
     }
-    console.error("Contact message error:", error);
+    logger.error("Contact message error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

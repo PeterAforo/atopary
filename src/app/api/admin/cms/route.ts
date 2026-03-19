@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
 
     return NextResponse.json({ pages });
   } catch (error) {
-    console.error("CMS pages fetch error:", error);
+    logger.error("CMS pages fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(page, { status: 201 });
   } catch (error: any) {
-    console.error("CMS page create error:", error);
+    logger.error("CMS page create error", error);
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -24,7 +25,7 @@ export async function GET() {
 
     return NextResponse.json(favorites);
   } catch (error) {
-    console.error("Favorites fetch error:", error);
+    logger.error("Favorites fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ favorited: true }, { status: 201 });
   } catch (error) {
-    console.error("Favorite toggle error:", error);
+    logger.error("Favorite toggle error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

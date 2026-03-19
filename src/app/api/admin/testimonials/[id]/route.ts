@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function PUT(
   request: Request,
@@ -30,7 +31,7 @@ export async function PUT(
 
     return NextResponse.json(testimonial);
   } catch (error) {
-    console.error("Testimonial update error:", error);
+    logger.error("Testimonial update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -49,7 +50,7 @@ export async function DELETE(
     await prisma.testimonial.delete({ where: { id } });
     return NextResponse.json({ message: "Testimonial deleted" });
   } catch (error) {
-    console.error("Testimonial delete error:", error);
+    logger.error("Testimonial delete error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

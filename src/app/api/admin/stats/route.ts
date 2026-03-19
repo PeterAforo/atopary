@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -52,7 +53,7 @@ export async function GET() {
       recentInquiries,
     });
   } catch (error) {
-    console.error("Admin stats error:", error);
+    logger.error("Admin stats error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

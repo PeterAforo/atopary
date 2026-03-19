@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function PUT(
   request: Request,
@@ -27,7 +28,7 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Mortgage update error:", error);
+    logger.error("Mortgage update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
