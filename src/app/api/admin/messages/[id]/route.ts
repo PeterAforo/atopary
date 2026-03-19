@@ -15,23 +15,16 @@ export async function PUT(
     }
 
     const body = await request.json();
+    const { isRead } = body;
 
-    const allowedFields = ["title", "slug", "content", "metaTitle", "metaDesc", "isPublished"];
-    const data: Record<string, unknown> = {};
-    for (const key of allowedFields) {
-      if (body[key] !== undefined) {
-        data[key] = body[key];
-      }
-    }
-
-    const page = await prisma.cMSPage.update({
+    const message = await prisma.contactMessage.update({
       where: { id },
-      data,
+      data: { ...(isRead !== undefined && { isRead }) },
     });
 
-    return NextResponse.json(page);
+    return NextResponse.json(message);
   } catch (error) {
-    console.error("CMS page update error:", error);
+    console.error("Message update error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -47,10 +40,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.cMSPage.delete({ where: { id } });
-    return NextResponse.json({ message: "Page deleted" });
+    await prisma.contactMessage.delete({ where: { id } });
+    return NextResponse.json({ message: "Message deleted" });
   } catch (error) {
-    console.error("CMS page delete error:", error);
+    console.error("Message delete error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

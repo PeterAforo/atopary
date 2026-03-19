@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,14 +8,23 @@ import { Star, Quote } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const testimonials = [
+interface Testimonial {
+  id?: string;
+  name: string;
+  role: string | null;
+  content: string;
+  rating: number;
+  avatar: string | null;
+}
+
+const fallbackTestimonials: Testimonial[] = [
   {
     name: "Kwame Asante",
     role: "Property Buyer",
     content:
       "Atopary made finding our dream home an absolute breeze. The virtual tours saved us so much time, and the mortgage calculator helped us plan our finances perfectly.",
     rating: 5,
-    avatar: "KA",
+    avatar: null,
   },
   {
     name: "Ama Mensah",
@@ -23,7 +32,7 @@ const testimonials = [
     content:
       "I listed my property and within weeks, Atopary connected me with serious buyers. The process was transparent, professional, and hassle-free.",
     rating: 5,
-    avatar: "AM",
+    avatar: null,
   },
   {
     name: "Joseph Owusu",
@@ -31,12 +40,24 @@ const testimonials = [
     content:
       "As an investor, I rely on Atopary for market insights and verified listings. Their platform has been instrumental in growing my property portfolio.",
     rating: 5,
-    avatar: "JO",
+    avatar: null,
   },
 ];
 
 export default function TestimonialsSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
+
+  useEffect(() => {
+    fetch("/api/testimonials")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setTestimonials(data);
+        }
+      })
+      .catch(() => { /* use fallback */ });
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -56,7 +77,7 @@ export default function TestimonialsSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [testimonials]);
 
   return (
     <section ref={sectionRef} className="py-24 bg-white">
@@ -93,7 +114,7 @@ export default function TestimonialsSection() {
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-                    {testimonial.avatar}
+                    {testimonial.avatar || testimonial.name.split(" ").map((n) => n[0]).join("")}
                   </div>
                   <div>
                     <p className="font-semibold text-secondary">

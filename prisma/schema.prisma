@@ -61,6 +61,7 @@ model User {
   properties     Property[]
   inquiries      Inquiry[]
   mortgages      MortgageApplication[]
+  favorites      Favorite[]
   sessions       Session[]
   accounts       Account[]
 
@@ -131,6 +132,7 @@ model Property {
 
   inquiries   Inquiry[]
   mortgages   MortgageApplication[]
+  favorites   Favorite[]
 
   isFeatured  Boolean        @default(false)
   views       Int            @default(0)
@@ -276,6 +278,29 @@ model ContactMessage {
   createdAt DateTime @default(now())
 
   @@map("contact_messages")
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId])
+  @@map("favorites")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
 }
 
 model SiteSettings {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import logger from "@/lib/logger";
 
 export async function GET(
   request: Request,
@@ -33,7 +34,7 @@ export async function GET(
 
     return NextResponse.json(property);
   } catch (error) {
-    console.error("Property fetch error:", error);
+    logger.error("Property fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -59,15 +60,33 @@ export async function PUT(
     }
 
     const body = await request.json();
+
+    const allowedFields = [
+      "title", "description", "price", "address", "city", "state", "zipCode",
+      "country", "type", "status", "bedrooms", "bathrooms", "area", "yearBuilt",
+      "parking", "furnished", "features", "virtualTour", "isFeatured",
+    ];
+    const data: Record<string, unknown> = {};
+    for (const key of allowedFields) {
+      if (body[key] !== undefined) {
+        data[key] = body[key];
+      }
+    }
+    // Only admins can change status and isFeatured
+    if (session.user.role !== "ADMIN") {
+      delete data.status;
+      delete data.isFeatured;
+    }
+
     const updated = await prisma.property.update({
       where: { id },
-      data: body,
+      data,
       include: { images: true, videos: true },
     });
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Property update error:", error);
+    logger.error("Property update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -95,7 +114,7 @@ export async function DELETE(
     await prisma.property.delete({ where: { id } });
     return NextResponse.json({ message: "Property deleted" });
   } catch (error) {
-    console.error("Property delete error:", error);
+    logger.error("Property delete error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

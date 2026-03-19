@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { slugify } from "@/lib/utils";
+import logger from "@/lib/logger";
 
 export async function GET(request: Request) {
   try {
@@ -68,7 +69,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Properties fetch error:", error);
+    logger.error("Properties fetch error", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(property, { status: 201 });
   } catch (error: any) {
-    console.error("Property creation error:", error);
+    logger.error("Property creation error", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

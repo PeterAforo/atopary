@@ -165,7 +165,16 @@ function LoginForm() {
             </motion.button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-4 text-center text-sm">
+            <Link
+              href="/auth/forgot-password"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              Forgot your password?
+            </Link>
+          </p>
+
+          <p className="mt-3 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               href="/auth/register"

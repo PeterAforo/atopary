@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /buyer/
+Disallow: /api/
+Disallow: /auth/
+
+Sitemap: https://atopary.com/sitemap.xml

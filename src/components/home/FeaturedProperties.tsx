@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -19,103 +19,38 @@ import { formatCurrency, getPropertyTypeLabel } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const demoProperties = [
-  {
-    id: "1",
-    title: "Modern Villa in East Legon",
-    slug: "modern-villa-east-legon",
-    price: 1500000,
-    address: "East Legon",
-    city: "Accra",
-    type: "VILLA",
-    bedrooms: 5,
-    bathrooms: 4,
-    area: 450,
-    image:
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&auto=format&fit=crop",
-    isFeatured: true,
-  },
-  {
-    id: "2",
-    title: "Luxury Apartment in Airport Residential",
-    slug: "luxury-apartment-airport-residential",
-    price: 850000,
-    address: "Airport Residential",
-    city: "Accra",
-    type: "APARTMENT",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 200,
-    image:
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop",
-    isFeatured: true,
-  },
-  {
-    id: "3",
-    title: "Executive House in Cantonments",
-    slug: "executive-house-cantonments",
-    price: 2200000,
-    address: "Cantonments",
-    city: "Accra",
-    type: "HOUSE",
-    bedrooms: 6,
-    bathrooms: 5,
-    area: 600,
-    image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop",
-    isFeatured: true,
-  },
-  {
-    id: "4",
-    title: "Beachfront Condo in Tema",
-    slug: "beachfront-condo-tema",
-    price: 650000,
-    address: "Community 25",
-    city: "Tema",
-    type: "CONDO",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 180,
-    image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop",
-    isFeatured: true,
-  },
-  {
-    id: "5",
-    title: "Commercial Office Space in Osu",
-    slug: "commercial-office-osu",
-    price: 3500000,
-    address: "Oxford Street",
-    city: "Accra",
-    type: "COMMERCIAL",
-    bedrooms: 0,
-    bathrooms: 4,
-    area: 1200,
-    image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop",
-    isFeatured: true,
-  },
-  {
-    id: "6",
-    title: "Modern Townhouse in Spintex",
-    slug: "modern-townhouse-spintex",
-    price: 420000,
-    address: "Spintex Road",
-    city: "Accra",
-    type: "TOWNHOUSE",
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 280,
-    image:
-      "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&auto=format&fit=crop",
-    isFeatured: true,
-  },
-];
+interface FeaturedProperty {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  address: string;
+  city: string;
+  type: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  images: { url: string; alt?: string }[];
+  isFeatured: boolean;
+}
 
 export default function FeaturedProperties() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [properties, setProperties] = useState<FeaturedProperty[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    fetch("/api/properties?limit=6&status=APPROVED&sort=newest")
+      .then((res) => res.json())
+      .then((data) => {
+        setProperties(data.properties || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (loading || properties.length === 0) return;
     const ctx = gsap.context(() => {
       gsap.from(".featured-header", {
         y: 60,
@@ -146,7 +81,7 @@ export default function FeaturedProperties() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, properties]);
 
   return (
     <section ref={sectionRef} className="py-24 bg-white">
@@ -168,7 +103,7 @@ export default function FeaturedProperties() {
 
         {/* Property Grid */}
         <div className="property-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {demoProperties.map((property) => (
+          {properties.map((property) => (
             <motion.div
               key={property.id}
               className="property-card group"
@@ -180,8 +115,8 @@ export default function FeaturedProperties() {
                   {/* Image */}
                   <div className="relative h-64 overflow-hidden">
                     <Image
-                      src={property.image}
-                      alt={property.title}
+                      src={property.images?.[0]?.url || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop"}
+                      alt={property.images?.[0]?.alt || property.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -206,7 +141,7 @@ export default function FeaturedProperties() {
                     </div>
 
                     {/* Actions */}
-                    <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}

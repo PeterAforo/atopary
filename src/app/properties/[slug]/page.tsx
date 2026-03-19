@@ -30,6 +30,15 @@ export default function PropertyDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
+    if (lightboxOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [lightboxOpen]);
+
+  useEffect(() => {
     const fetchProperty = async () => {
       try {
         const res = await fetch(`/api/properties/${slug}`);
@@ -124,7 +133,7 @@ export default function PropertyDetailPage() {
                 className="relative"
               >
                 <div
-                  className="relative h-[500px] rounded-2xl overflow-hidden cursor-pointer"
+                  className="relative h-[300px] sm:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden cursor-pointer"
                   onClick={() => setLightboxOpen(true)}
                 >
                   <Image

@@ -15,8 +15,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-
-    const allowedFields = ["title", "slug", "content", "metaTitle", "metaDesc", "isPublished"];
+    const allowedFields = ["name", "role", "content", "avatar", "rating", "isActive"];
     const data: Record<string, unknown> = {};
     for (const key of allowedFields) {
       if (body[key] !== undefined) {
@@ -24,14 +23,14 @@ export async function PUT(
       }
     }
 
-    const page = await prisma.cMSPage.update({
+    const testimonial = await prisma.testimonial.update({
       where: { id },
       data,
     });
 
-    return NextResponse.json(page);
+    return NextResponse.json(testimonial);
   } catch (error) {
-    console.error("CMS page update error:", error);
+    console.error("Testimonial update error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -47,10 +46,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.cMSPage.delete({ where: { id } });
-    return NextResponse.json({ message: "Page deleted" });
+    await prisma.testimonial.delete({ where: { id } });
+    return NextResponse.json({ message: "Testimonial deleted" });
   } catch (error) {
-    console.error("CMS page delete error:", error);
+    console.error("Testimonial delete error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

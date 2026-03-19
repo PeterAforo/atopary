@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Building2, Users, MessageSquare, Calculator,
   FileText, Settings, LogOut, Menu, X, ChevronDown, Bell,
   Home, ShoppingBag, PlusCircle, BarChart3, Globe, Layers,
-  Mail, Star, UserPlus,
+  Mail, Star, UserPlus, Loader2,
 } from "lucide-react";
 
 interface NavItem {
@@ -52,13 +52,53 @@ const navItems: Record<string, NavItem[]> = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Determine which role section this page belongs to
+  const pageRole = pathname.startsWith("/admin")
+    ? "ADMIN"
+    : pathname.startsWith("/seller")
+    ? "SELLER"
+    : pathname.startsWith("/buyer")
+    ? "BUYER"
+    : null;
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+      return;
+    }
+    if (status === "authenticated" && session?.user && pageRole) {
+      const userRole = (session.user as { role?: string }).role;
+      if (userRole !== pageRole && userRole !== "ADMIN") {
+        switch (userRole) {
+          case "ADMIN": router.push("/admin"); break;
+          case "SELLER": router.push("/seller"); break;
+          case "BUYER": router.push("/buyer"); break;
+          default: router.push("/");
+        }
+      }
+    }
+  }, [status, session, pageRole, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!session) return null;
 
-  const role = session.user.role;
+  const role = (session.user as { role: string }).role;
+
+  // Block access if user role doesn't match page section (admin can access all)
+  if (pageRole && role !== pageRole && role !== "ADMIN") return null;
+
   const items = navItems[role] || [];
 
   return (

@@ -53,11 +53,18 @@
 
   input, select, textarea {
     outline: none;
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
   }
 
   input:focus, select:focus, textarea:focus {
     border-color: #C41E24;
     box-shadow: 0 0 0 3px rgba(196, 30, 36, 0.1);
+  }
+
+  /* Safe area insets for notched devices (iPhone X+) */
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 }
 
