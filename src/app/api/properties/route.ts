@@ -172,3 +172,48 @@ export async function POST(request: Request) {
     );
   }
 }
+
+// Bulk actions on properties (admin only)
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { ids, action } = body as { ids: string[]; action: string };
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0 || !action) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+
+    switch (action) {
+      case "approve":
+        await prisma.property.updateMany({ where: { id: { in: ids } }, data: { status: "APPROVED" } });
+        break;
+      case "reject":
+        await prisma.property.updateMany({ where: { id: { in: ids } }, data: { status: "REJECTED" } });
+        break;
+      case "feature":
+        await prisma.property.updateMany({ where: { id: { in: ids } }, data: { isFeatured: true } });
+        break;
+      case "unfeature":
+        await prisma.property.updateMany({ where: { id: { in: ids } }, data: { isFeatured: false } });
+        break;
+      case "archive":
+        await prisma.property.updateMany({ where: { id: { in: ids } }, data: { status: "ARCHIVED" } });
+        break;
+      case "delete":
+        await prisma.property.deleteMany({ where: { id: { in: ids } } });
+        break;
+      default:
+        return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: `Bulk ${action} completed on ${ids.length} properties` });
+  } catch (error) {
+    logger.error("Bulk property action error", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
