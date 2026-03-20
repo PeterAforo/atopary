@@ -34,7 +34,7 @@ export default function BuyerInquiriesPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-secondary">My Inquiries</h2>
-        <p className="text-sm text-muted-foreground">Track the status of your property inquiries</p>
+        <p className="text-sm text-muted-foreground">Track the status of your property inquiries handled by Atopary</p>
       </div>
 
       {loading ? (
@@ -92,7 +92,7 @@ export default function BuyerInquiriesPage() {
                     </div>
                     {inquiry.response && (
                       <div>
-                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Seller Response</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Response from Atopary</p>
                         <p className="text-sm text-secondary bg-green-50 p-3 rounded-lg border border-green-200">{inquiry.response}</p>
                       </div>
                     )}

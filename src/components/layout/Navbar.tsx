@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -21,6 +22,8 @@ import {
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -57,7 +60,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
+        isScrolled || !isHomePage
           ? "bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-100"
           : "bg-transparent"
       }`}
@@ -83,14 +86,14 @@ export default function Navbar() {
             <div className="hidden sm:block">
               <h1
                 className={`text-xl font-bold tracking-tight ${
-                  isScrolled ? "text-secondary" : "text-white"
+                  isScrolled || !isHomePage ? "text-secondary" : "text-white"
                 }`}
               >
                 ATOPARY
               </h1>
               <p
                 className={`text-[10px] tracking-[0.2em] uppercase ${
-                  isScrolled ? "text-muted-foreground" : "text-white/70"
+                  isScrolled || !isHomePage ? "text-muted-foreground" : "text-white/70"
                 }`}
               >
                 Properties
@@ -105,7 +108,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-primary/10 hover:text-primary ${
-                  isScrolled
+                  isScrolled || !isHomePage
                     ? "text-secondary"
                     : "text-white hover:bg-white/10"
                 }`}
@@ -124,7 +127,7 @@ export default function Navbar() {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    isScrolled
+                    isScrolled || !isHomePage
                       ? "bg-gray-100 text-secondary hover:bg-gray-200"
                       : "bg-white/10 text-white hover:bg-white/20"
                   }`}
@@ -192,7 +195,7 @@ export default function Navbar() {
                 <Link
                   href="/auth/login"
                   className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    isScrolled
+                    isScrolled || !isHomePage
                       ? "text-secondary hover:text-primary"
                       : "text-white hover:text-primary-light"
                   }`}

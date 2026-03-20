@@ -59,8 +59,8 @@ export default function SellerInquiriesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-secondary">Buyer Inquiries</h2>
-        <p className="text-sm text-muted-foreground">View and respond to inquiries about your properties</p>
+        <h2 className="text-2xl font-bold text-secondary">Property Inquiries</h2>
+        <p className="text-sm text-muted-foreground">View and respond to inquiries managed by Atopary on your behalf</p>
       </div>
 
       {loading ? (
@@ -87,10 +87,10 @@ export default function SellerInquiriesPage() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                    {inquiry.buyer?.name?.charAt(0)}
+                    A
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-secondary">{inquiry.buyer?.name}</p>
+                    <p className="text-sm font-semibold text-secondary">Inquiry via Atopary</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Building2 className="w-3 h-3" /> {inquiry.property?.title}
                     </p>
@@ -125,23 +125,26 @@ export default function SellerInquiriesPage() {
                     )}
 
                     {inquiry.status !== "RESPONDED" && inquiry.status !== "CLOSED" && (
-                      <div className="flex gap-2">
-                        <textarea
-                          value={responseText}
-                          onChange={(e) => setResponseText(e.target.value)}
-                          placeholder="Type your response..."
-                          rows={3}
-                          className="flex-1 px-4 py-2.5 bg-muted border border-border rounded-xl text-sm resize-none"
-                        />
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleRespond(inquiry.id)}
-                          disabled={responding || !responseText.trim()}
-                          className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold self-end disabled:opacity-50 flex items-center gap-1"
-                        >
-                          {responding ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-3 h-3" /> Reply</>}
-                        </motion.button>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-2">Your response will be forwarded to the buyer by Atopary.</p>
+                        <div className="flex gap-2">
+                          <textarea
+                            value={responseText}
+                            onChange={(e) => setResponseText(e.target.value)}
+                            placeholder="Type your response to Atopary..."
+                            rows={3}
+                            className="flex-1 px-4 py-2.5 bg-muted border border-border rounded-xl text-sm resize-none"
+                          />
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleRespond(inquiry.id)}
+                            disabled={responding || !responseText.trim()}
+                            className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold self-end disabled:opacity-50 flex items-center gap-1"
+                          >
+                            {responding ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-3 h-3" /> Reply</>}
+                          </motion.button>
+                        </div>
                       </div>
                     )}
                   </div>

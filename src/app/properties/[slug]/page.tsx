@@ -312,28 +312,31 @@ export default function PropertyDetailPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Seller Card */}
+              {/* Atopary Contact Card */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-28"
               >
-                <h3 className="text-lg font-bold text-secondary mb-4">Contact Seller</h3>
-                <div className="flex items-center gap-3 mb-6">
+                <h3 className="text-lg font-bold text-secondary mb-4">Contact Atopary</h3>
+                <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-                    {property.seller?.name?.charAt(0).toUpperCase()}
+                    A
                   </div>
                   <div>
-                    <p className="font-semibold text-secondary">{property.seller?.name}</p>
-                    <p className="text-sm text-muted-foreground">Property Owner</p>
+                    <p className="font-semibold text-secondary">Atopary Properties</p>
+                    <p className="text-sm text-muted-foreground">Your Trusted Real Estate Partner</p>
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground mb-4">
+                  All property inquiries are handled by Atopary Properties. We act on your behalf to ensure a smooth and secure transaction.
+                </p>
 
                 {sent ? (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-center">
                     <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
                     <p className="font-semibold text-green-700">Inquiry Sent!</p>
-                    <p className="text-sm text-green-600 mt-1">We&apos;ll get back to you soon.</p>
+                    <p className="text-sm text-green-600 mt-1">Our team will get back to you shortly.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -356,20 +359,10 @@ export default function PropertyDetailPage() {
                       ) : (
                         <>
                           <MessageSquare className="w-4 h-4" />
-                          Send Inquiry
+                          Send Inquiry to Atopary
                         </>
                       )}
                     </motion.button>
-
-                    {property.seller?.phone && (
-                      <a
-                        href={`tel:${property.seller.phone}`}
-                        className="w-full py-3 bg-secondary text-white rounded-xl font-semibold hover:bg-secondary/90 transition-all flex items-center justify-center gap-2"
-                      >
-                        <Phone className="w-4 h-4" />
-                        Call Seller
-                      </a>
-                    )}
                   </div>
                 )}
 

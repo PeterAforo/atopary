@@ -17,7 +17,7 @@ export async function GET(
         images: { orderBy: { order: "asc" } },
         videos: true,
         seller: {
-          select: { id: true, name: true, email: true, phone: true, avatar: true },
+          select: { id: true, name: true },
         },
         _count: { select: { inquiries: true } },
       },
