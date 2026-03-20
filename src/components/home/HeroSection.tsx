@@ -97,13 +97,6 @@ export default function HeroSection() {
         ease: "none",
       });
 
-      gsap.to(".hero-float", {
-        y: -15,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: "power2.inOut",
-      });
     }, heroRef);
 
     return () => ctx.revert();
