@@ -10,6 +10,25 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
+interface RecentProperty {
+  id: string;
+  title: string;
+  city: string;
+  price: number;
+  status: string;
+  views: number;
+  createdAt: string;
+}
+
+interface RecentInquiry {
+  id: string;
+  message: string;
+  status: string;
+  createdAt: string;
+  buyer?: { name: string };
+  property?: { title: string };
+}
+
 interface DashboardStats {
   totalProperties: number;
   pendingProperties: number;
@@ -17,8 +36,8 @@ interface DashboardStats {
   totalInquiries: number;
   totalMortgages: number;
   pendingMortgages: number;
-  recentProperties: any[];
-  recentInquiries: any[];
+  recentProperties: RecentProperty[];
+  recentInquiries: RecentInquiry[];
 }
 
 export default function AdminDashboard() {
@@ -164,7 +183,7 @@ export default function AdminDashboard() {
           </div>
           <div className="space-y-3">
             {stats?.recentProperties?.length ? (
-              stats.recentProperties.map((prop: any) => (
+              stats.recentProperties.map((prop) => (
                 <div key={prop.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-colors">
                   <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-primary" />
@@ -203,7 +222,7 @@ export default function AdminDashboard() {
           </div>
           <div className="space-y-3">
             {stats?.recentInquiries?.length ? (
-              stats.recentInquiries.map((inq: any) => (
+              stats.recentInquiries.map((inq) => (
                 <div key={inq.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-colors">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                     {inq.buyer?.name?.charAt(0)}

@@ -11,13 +11,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const pages = await prisma.cMSPage.findMany({
-      orderBy: { updatedAt: "desc" },
+    const sections = await prisma.cMSSection.findMany({
+      orderBy: { order: "asc" },
     });
 
-    return NextResponse.json({ pages });
+    return NextResponse.json(sections);
   } catch (error) {
-    logger.error("CMS pages fetch error", error);
+    logger.error("CMS sections fetch error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -30,15 +30,27 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, slug, content, metaTitle, metaDesc, isPublished } = body;
+    const { key, title, subtitle, content, image, order, isActive } = body;
 
-    const page = await prisma.cMSPage.create({
-      data: { title, slug, content, metaTitle, metaDesc, isPublished },
+    if (!key || !title) {
+      return NextResponse.json({ error: "Key and title are required" }, { status: 400 });
+    }
+
+    const section = await prisma.cMSSection.create({
+      data: {
+        key,
+        title,
+        subtitle: subtitle || null,
+        content: content || null,
+        image: image || null,
+        order: order || 0,
+        isActive: isActive !== undefined ? isActive : true,
+      },
     });
 
-    return NextResponse.json(page, { status: 201 });
+    return NextResponse.json(section, { status: 201 });
   } catch (error) {
-    logger.error("CMS page create error", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 });
+    logger.error("CMS section create error", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { z } from "zod";
 import { contactSchema } from "@/lib/validations";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 import { sanitizeObject } from "@/lib/sanitize";
@@ -24,9 +25,9 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ message: "Message sent successfully", id: message.id }, { status: 201 });
-  } catch (error: any) {
-    if (error.name === "ZodError") {
-      return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
     }
     logger.error("Contact message error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

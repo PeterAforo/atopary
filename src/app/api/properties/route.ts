@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const sortOrder = searchParams.get("sortOrder") || "desc";
     const status = searchParams.get("status") || "APPROVED";
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (status) where.status = status;
 
@@ -36,9 +36,10 @@ export async function GET(request: Request) {
     if (type) where.type = type;
     if (city) where.city = { contains: city, mode: "insensitive" };
     if (minPrice || maxPrice) {
-      where.price = {};
-      if (minPrice) where.price.gte = parseFloat(minPrice);
-      if (maxPrice) where.price.lte = parseFloat(maxPrice);
+      const priceFilter: Record<string, number> = {};
+      if (minPrice) priceFilter.gte = parseFloat(minPrice);
+      if (maxPrice) priceFilter.lte = parseFloat(maxPrice);
+      where.price = priceFilter;
     }
     if (bedrooms) where.bedrooms = { gte: parseInt(bedrooms) };
 
@@ -137,7 +138,7 @@ export async function POST(request: Request) {
         status: session.user.role === "ADMIN" ? "APPROVED" : "PENDING",
         images: images?.length
           ? {
-              create: images.map((img: any, index: number) => ({
+              create: images.map((img: { url: string; alt?: string }, index: number) => ({
                 url: img.url,
                 alt: img.alt || title,
                 isPrimary: index === 0,
@@ -147,7 +148,7 @@ export async function POST(request: Request) {
           : undefined,
         videos: videos?.length
           ? {
-              create: videos.map((vid: any) => ({
+              create: videos.map((vid: { url: string; title?: string; isVirtual?: boolean }) => ({
                 url: vid.url,
                 title: vid.title || "",
                 isVirtual: vid.isVirtual || false,
@@ -163,10 +164,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(property, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     logger.error("Property creation error", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }

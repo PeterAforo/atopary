@@ -16,7 +16,7 @@ import {
 interface NavItem {
   label: string;
   href: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   badge?: number;
 }
 

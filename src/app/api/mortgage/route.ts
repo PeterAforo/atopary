@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (session.user.role === "BUYER") {
       where.buyerId = session.user.id;
     }
@@ -101,10 +101,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(application, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     logger.error("Mortgage application error:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }
