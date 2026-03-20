@@ -96,3 +96,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+// Bulk actions on inquiries (admin only)
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { ids, action } = body as { ids: string[]; action: string };
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0 || !action) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+
+    switch (action) {
+      case "in_progress":
+        await prisma.inquiry.updateMany({ where: { id: { in: ids } }, data: { status: "IN_PROGRESS" } });
+        break;
+      case "responded":
+        await prisma.inquiry.updateMany({ where: { id: { in: ids } }, data: { status: "RESPONDED" } });
+        break;
+      case "closed":
+        await prisma.inquiry.updateMany({ where: { id: { in: ids } }, data: { status: "CLOSED" } });
+        break;
+      case "delete":
+        await prisma.inquiry.deleteMany({ where: { id: { in: ids } } });
+        break;
+      default:
+        return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: `Bulk ${action} completed on ${ids.length} inquiries` });
+  } catch (error) {
+    logger.error("Bulk inquiry action error", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

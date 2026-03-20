@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Calculator, Loader2, Building2, ChevronDown, ChevronUp,
-  CheckCircle, XCircle, Clock, Save,
+  Calculator, Loader2, ChevronDown, ChevronUp,
+  CheckCircle, XCircle, Clock, Trash2, X,
 } from "lucide-react";
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
 
@@ -13,41 +13,65 @@ export default function AdminMortgagesPage() {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [toast, setToast] = useState("");
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   const fetchMortgages = async () => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/mortgage");
+      const params = new URLSearchParams();
+      if (statusFilter) params.set("status", statusFilter);
+      const res = await fetch(`/api/mortgage?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setMortgages(data.applications || []);
       }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error("Error:", error); }
+    finally { setLoading(false); setSelected(new Set()); }
   };
 
-  useEffect(() => { fetchMortgages(); }, []);
+  useEffect(() => { fetchMortgages(); }, [statusFilter]);
 
   const handleStatusChange = async (id: string, status: string) => {
     setUpdating(id);
     try {
       const res = await fetch(`/api/mortgage/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
       if (res.ok) {
-        setMortgages((prev) =>
-          prev.map((m) => (m.id === id ? { ...m, status } : m))
-        );
+        setMortgages((prev) => prev.map((m) => (m.id === id ? { ...m, status } : m)));
+        showToast(`Status changed to ${status.replace("_", " ")}`);
       }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setUpdating(null);
-    }
+    } catch (error) { console.error("Error:", error); }
+    finally { setUpdating(null); }
+  };
+
+  // ─── Bulk actions ───────────────────────────────────────────
+  const toggleSelect = (id: string) => {
+    setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  };
+  const toggleSelectAll = () => {
+    if (selected.size === mortgages.length) setSelected(new Set());
+    else setSelected(new Set(mortgages.map(m => m.id)));
+  };
+
+  const handleBulkAction = async (action: string) => {
+    if (selected.size === 0) return;
+    if (action === "delete" && !confirm(`Delete ${selected.size} applications?`)) return;
+    setBulkLoading(true);
+    try {
+      const res = await fetch("/api/mortgage", {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selected), action }),
+      });
+      if (res.ok) { fetchMortgages(); showToast(`Action applied to ${selected.size} applications`); }
+    } catch (error) { console.error("Error:", error); }
+    finally { setBulkLoading(false); }
   };
 
   const getStatusIcon = (status: string) => {
@@ -61,10 +85,61 @@ export default function AdminMortgagesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 right-6 z-50 px-5 py-3 bg-secondary text-white text-sm font-medium rounded-xl shadow-lg">
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div>
         <h2 className="text-2xl font-bold text-secondary">Mortgage Applications</h2>
-        <p className="text-sm text-muted-foreground">Review and manage all mortgage applications</p>
+        <p className="text-sm text-muted-foreground">Review, approve, and manage all mortgage applications</p>
       </div>
+
+      {/* Status Filter */}
+      <div className="bg-white rounded-xl p-4 border border-border flex flex-wrap gap-2">
+        {["", "PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED"].map((status) => (
+          <button key={status} onClick={() => setStatusFilter(status)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              statusFilter === status ? "bg-primary text-white" : "bg-muted text-muted-foreground hover:bg-gray-200"
+            }`}>
+            {status ? status.replace("_", " ") : "All"}
+          </button>
+        ))}
+      </div>
+
+      {/* Bulk Actions Bar */}
+      {selected.size > 0 && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-secondary text-white rounded-xl px-5 py-3 flex items-center justify-between flex-wrap gap-2">
+          <span className="text-sm font-medium">{selected.size} selected</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button onClick={() => handleBulkAction("under_review")} disabled={bulkLoading}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-600 hover:bg-orange-700 flex items-center gap-1 disabled:opacity-50">
+              <Clock className="w-3 h-3" /> Under Review
+            </button>
+            <button onClick={() => handleBulkAction("approve")} disabled={bulkLoading}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 hover:bg-green-700 flex items-center gap-1 disabled:opacity-50">
+              <CheckCircle className="w-3 h-3" /> Approve
+            </button>
+            <button onClick={() => handleBulkAction("reject")} disabled={bulkLoading}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 flex items-center gap-1 disabled:opacity-50">
+              <XCircle className="w-3 h-3" /> Reject
+            </button>
+            <button onClick={() => handleBulkAction("delete")} disabled={bulkLoading}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-600 hover:bg-gray-700 flex items-center gap-1 disabled:opacity-50">
+              <Trash2 className="w-3 h-3" /> Delete
+            </button>
+            <button onClick={() => setSelected(new Set())} className="ml-2 p-1.5 hover:bg-white/10 rounded-lg">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -73,46 +148,47 @@ export default function AdminMortgagesPage() {
       ) : mortgages.length === 0 ? (
         <div className="bg-white rounded-xl border border-border text-center py-20">
           <Calculator className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-muted-foreground">No mortgage applications yet</p>
+          <p className="text-muted-foreground">No mortgage applications found</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
+          {/* Select All */}
+          <div className="flex items-center gap-3 px-2">
+            <input type="checkbox" checked={selected.size === mortgages.length && mortgages.length > 0}
+              onChange={toggleSelectAll} className="w-4 h-4 rounded border-gray-300 text-primary" />
+            <span className="text-xs text-muted-foreground font-medium">Select all ({mortgages.length})</span>
+          </div>
+
           {mortgages.map((mortgage: any) => (
-            <motion.div
-              key={mortgage.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl border border-border overflow-hidden"
-            >
-              <div
-                className="p-5 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors"
-                onClick={() => setExpandedId(expandedId === mortgage.id ? null : mortgage.id)}
-              >
-                <div className="flex items-center gap-4">
-                  {getStatusIcon(mortgage.status)}
-                  <div>
-                    <p className="text-sm font-semibold text-secondary">
-                      {mortgage.fullName} — {formatCurrency(mortgage.loanAmount)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {mortgage.property?.title || "General"} · {formatDate(mortgage.createdAt)}
-                    </p>
+            <div key={mortgage.id}
+              className={`bg-white rounded-xl border overflow-hidden transition-colors ${selected.has(mortgage.id) ? "border-primary/40 bg-primary/5" : "border-border"}`}>
+              <div className="p-5 flex items-center gap-4">
+                <input type="checkbox" checked={selected.has(mortgage.id)}
+                  onChange={() => toggleSelect(mortgage.id)} className="w-4 h-4 rounded border-gray-300 text-primary flex-shrink-0" />
+                <div className="flex-1 flex items-center justify-between cursor-pointer"
+                  onClick={() => setExpandedId(expandedId === mortgage.id ? null : mortgage.id)}>
+                  <div className="flex items-center gap-4">
+                    {getStatusIcon(mortgage.status)}
+                    <div>
+                      <p className="text-sm font-semibold text-secondary">
+                        {mortgage.fullName} — {formatCurrency(mortgage.loanAmount)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {mortgage.property?.title || "General"} · {formatDate(mortgage.createdAt)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${getStatusColor(mortgage.status)}`}>
-                    {mortgage.status}
-                  </span>
-                  {expandedId === mortgage.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${getStatusColor(mortgage.status)}`}>
+                      {mortgage.status.replace("_", " ")}
+                    </span>
+                    {expandedId === mortgage.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                  </div>
                 </div>
               </div>
 
               {expandedId === mortgage.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  className="border-t border-border"
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border-t border-border">
                   <div className="p-5 space-y-5">
                     {/* Personal Info */}
                     <div>
@@ -200,7 +276,7 @@ export default function AdminMortgagesPage() {
                   </div>
                 </motion.div>
               )}
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

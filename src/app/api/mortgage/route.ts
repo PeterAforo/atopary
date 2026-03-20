@@ -16,10 +16,12 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
+    const status = searchParams.get("status");
     const where: Record<string, unknown> = {};
     if (session.user.role === "BUYER") {
       where.buyerId = session.user.id;
     }
+    if (status) where.status = status;
 
     const [applications, total] = await Promise.all([
       prisma.mortgageApplication.findMany({
@@ -107,5 +109,44 @@ export async function POST(request: Request) {
       { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+// Bulk actions on mortgage applications (admin only)
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { ids, action } = body as { ids: string[]; action: string };
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0 || !action) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+
+    switch (action) {
+      case "approve":
+        await prisma.mortgageApplication.updateMany({ where: { id: { in: ids } }, data: { status: "APPROVED" } });
+        break;
+      case "reject":
+        await prisma.mortgageApplication.updateMany({ where: { id: { in: ids } }, data: { status: "REJECTED" } });
+        break;
+      case "under_review":
+        await prisma.mortgageApplication.updateMany({ where: { id: { in: ids } }, data: { status: "UNDER_REVIEW" } });
+        break;
+      case "delete":
+        await prisma.mortgageApplication.deleteMany({ where: { id: { in: ids } } });
+        break;
+      default:
+        return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: `Bulk ${action} completed on ${ids.length} applications` });
+  } catch (error) {
+    logger.error("Bulk mortgage action error", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
