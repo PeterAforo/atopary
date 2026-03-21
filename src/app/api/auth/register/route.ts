@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import prisma from "@/lib/db";
 import { z } from "zod";
 import { registerSchema } from "@/lib/validations";
@@ -40,16 +41,41 @@ export async function POST(request: Request) {
         password: hashedPassword,
         phone: validated.phone,
         role: validated.role,
+        // emailVerified stays null until OTP is confirmed
       },
     });
 
-    return NextResponse.json(
-      {
-        message: "Account created successfully",
-        user: { id: user.id, name: user.name, email: user.email, role: user.role },
-      },
-      { status: 201 }
-    );
+    // Generate a 6-digit OTP and a secure token
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    // Invalidate any previous tokens for this email
+    await prisma.emailVerificationToken.updateMany({
+      where: { email: validated.email, used: false },
+      data: { used: true },
+    });
+
+    await prisma.emailVerificationToken.create({
+      data: { token, email: validated.email, otp, expiresAt },
+    });
+
+    const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?email=${encodeURIComponent(validated.email)}`;
+
+    // TODO: Integrate email service (SendGrid, Resend, etc.) to send OTP to user
+    // For now, return OTP in development mode
+    const response: Record<string, unknown> = {
+      message: "Account created. Please verify your email with the OTP sent to your inbox.",
+      requiresVerification: true,
+      email: validated.email,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    };
+
+    if (process.env.NODE_ENV === "development") {
+      response._dev = { otp, token, verifyUrl };
+    }
+
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -28,6 +28,11 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Account is deactivated");
         }
 
+        // Block unverified users (admin accounts are exempt)
+        if (!user.emailVerified && user.role !== "ADMIN") {
+          throw new Error("Email not verified");
+        }
+
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password

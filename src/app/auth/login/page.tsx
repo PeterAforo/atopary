@@ -39,6 +39,10 @@ function LoginForm() {
       });
 
       if (result?.error) {
+        if (result.error === "Email not verified") {
+          router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+          return;
+        }
         setError(result.error);
       } else {
         if (callbackUrl) {

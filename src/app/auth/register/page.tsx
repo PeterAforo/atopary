@@ -60,7 +60,11 @@ function RegisterForm() {
         return;
       }
 
-      router.push("/auth/login?registered=true");
+      if (result.requiresVerification) {
+        router.push(`/auth/verify-email?email=${encodeURIComponent(result.email)}`);
+      } else {
+        router.push("/auth/login?registered=true");
+      }
     } catch {
       setError("An unexpected error occurred");
     } finally {

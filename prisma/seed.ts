@@ -13,13 +13,14 @@ async function main() {
   const adminPassword = await bcrypt.hash("admin123", 12);
   const admin = await prisma.user.upsert({
     where: { email: "admin@atopary.com" },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       name: "Atopary Admin",
       email: "admin@atopary.com",
       password: adminPassword,
       role: "ADMIN",
       phone: "+233201234567",
+      emailVerified: new Date(),
     },
   });
   console.log("✅ Admin user created:", admin.email);
@@ -28,13 +29,14 @@ async function main() {
   const sellerPassword = await bcrypt.hash("seller123", 12);
   const seller = await prisma.user.upsert({
     where: { email: "seller@atopary.com" },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       name: "Kwame Properties",
       email: "seller@atopary.com",
       password: sellerPassword,
       role: "SELLER",
       phone: "+233209876543",
+      emailVerified: new Date(),
     },
   });
   console.log("✅ Seller user created:", seller.email);
@@ -43,13 +45,14 @@ async function main() {
   const buyerPassword = await bcrypt.hash("buyer123", 12);
   const buyer = await prisma.user.upsert({
     where: { email: "buyer@atopary.com" },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       name: "Ama Mensah",
       email: "buyer@atopary.com",
       password: buyerPassword,
       role: "BUYER",
       phone: "+233205551234",
+      emailVerified: new Date(),
     },
   });
   console.log("✅ Buyer user created:", buyer.email);
