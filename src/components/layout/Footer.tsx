@@ -169,10 +169,23 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="py-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/40 text-sm">
-            &copy; {new Date().getFullYear()} Atopary Properties. All rights
-            reserved.
-          </p>
+          <div className="text-center md:text-left">
+            <p className="text-white/40 text-sm">
+              &copy; {new Date().getFullYear()} Atopary Properties. All rights
+              reserved.
+            </p>
+            <p className="text-white/30 text-xs mt-1">
+              Developed by{" "}
+              <a
+                href="https://www.mcaforo.com"
+                target="_blank"
+                rel="noopener"
+                className="text-primary/70 hover:text-primary transition-colors font-medium"
+              >
+                McAforo
+              </a>
+            </p>
+          </div>
           <div className="flex items-center gap-4">
             {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
               <motion.a
