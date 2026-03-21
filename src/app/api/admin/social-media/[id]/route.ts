@@ -16,21 +16,24 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { role, isActive, permissions } = body;
+    const { platform, postUrl, embedCode, caption, order, isActive } = body;
 
-    const updated = await prisma.user.update({
+    const data: Record<string, unknown> = {};
+    if (platform !== undefined) data.platform = platform;
+    if (postUrl !== undefined) data.postUrl = postUrl;
+    if (embedCode !== undefined) data.embedCode = embedCode;
+    if (caption !== undefined) data.caption = caption;
+    if (order !== undefined) data.order = order;
+    if (isActive !== undefined) data.isActive = isActive;
+
+    const embed = await prisma.socialMediaEmbed.update({
       where: { id },
-      data: {
-        ...(role !== undefined && { role }),
-        ...(isActive !== undefined && { isActive }),
-        ...(permissions !== undefined && { permissions }),
-      },
-      select: { id: true, name: true, email: true, role: true, isActive: true, permissions: true },
+      data,
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(embed);
   } catch (error) {
-    logger.error("User update error", error);
+    logger.error("Social media update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -46,14 +49,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (id === session.user.id) {
-      return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
-    }
-
-    await prisma.user.delete({ where: { id } });
-    return NextResponse.json({ message: "User deleted" });
+    await prisma.socialMediaEmbed.delete({ where: { id } });
+    return NextResponse.json({ message: "Embed deleted" });
   } catch (error) {
-    logger.error("User delete error", error);
+    logger.error("Social media delete error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

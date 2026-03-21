@@ -32,7 +32,7 @@ export async function GET(request: Request) {
         where,
         select: {
           id: true, name: true, email: true, phone: true, role: true,
-          isActive: true, createdAt: true, avatar: true,
+          permissions: true, isActive: true, createdAt: true, avatar: true,
           _count: { select: { properties: true, inquiries: true, mortgages: true } },
         },
         orderBy: { createdAt: "desc" },

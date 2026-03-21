@@ -16,21 +16,28 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { role, isActive, permissions } = body;
+    const { subject, content, status } = body;
 
-    const updated = await prisma.user.update({
+    const data: Record<string, unknown> = {};
+    if (subject !== undefined) data.subject = subject;
+    if (content !== undefined) data.content = content;
+    if (status !== undefined) data.status = status;
+
+    // If "sending", mark sentAt and count active subscribers
+    if (status === "sent") {
+      const activeCount = await prisma.newsletterSubscriber.count({ where: { isActive: true } });
+      data.sentAt = new Date();
+      data.sentCount = activeCount;
+    }
+
+    const campaign = await prisma.newsletterCampaign.update({
       where: { id },
-      data: {
-        ...(role !== undefined && { role }),
-        ...(isActive !== undefined && { isActive }),
-        ...(permissions !== undefined && { permissions }),
-      },
-      select: { id: true, name: true, email: true, role: true, isActive: true, permissions: true },
+      data,
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(campaign);
   } catch (error) {
-    logger.error("User update error", error);
+    logger.error("Newsletter campaign update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -46,14 +53,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (id === session.user.id) {
-      return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
-    }
-
-    await prisma.user.delete({ where: { id } });
-    return NextResponse.json({ message: "User deleted" });
+    await prisma.newsletterCampaign.delete({ where: { id } });
+    return NextResponse.json({ message: "Campaign deleted" });
   } catch (error) {
-    logger.error("User delete error", error);
+    logger.error("Newsletter campaign delete error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

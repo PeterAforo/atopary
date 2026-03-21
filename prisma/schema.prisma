@@ -53,6 +53,7 @@ model User {
   phone         String?
   avatar        String?
   role          Role      @default(BUYER)
+  permissions   String[]  @default([])
   isActive      Boolean   @default(true)
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
@@ -313,6 +314,44 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
 
   @@map("email_verification_tokens")
+}
+
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  isActive     Boolean  @default(true)
+  subscribedAt DateTime @default(now())
+  unsubscribedAt DateTime?
+
+  @@map("newsletter_subscribers")
+}
+
+model NewsletterCampaign {
+  id        String   @id @default(cuid())
+  subject   String
+  content   String   @db.Text
+  sentAt    DateTime?
+  sentCount Int      @default(0)
+  status    String   @default("draft")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("newsletter_campaigns")
+}
+
+model SocialMediaEmbed {
+  id        String   @id @default(cuid())
+  platform  String
+  postUrl   String
+  embedCode String?  @db.Text
+  caption   String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("social_media_embeds")
 }
 
 model SiteSettings {

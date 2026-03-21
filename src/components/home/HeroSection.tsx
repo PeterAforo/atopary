@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import Link from "next/link";
 import {
@@ -13,6 +13,14 @@ import {
   Play,
   ChevronDown,
 } from "lucide-react";
+
+const FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80",
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80",
+  "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80",
+];
+
+const SLIDE_DURATION = 6000;
 
 const stats = [
   { value: "500+", label: "Properties Listed" },
@@ -36,6 +44,53 @@ export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [heroImages, setHeroImages] = useState<string[]>(FALLBACK_IMAGES);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Fetch hero images from CMS
+  useEffect(() => {
+    const fetchHeroImages = async () => {
+      try {
+        const res = await fetch("/api/sections/hero_section");
+        if (res.ok) {
+          const data = await res.json();
+          // Try parsing content as JSON array of image URLs
+          if (data.content) {
+            try {
+              const parsed = JSON.parse(data.content);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setHeroImages(parsed);
+                return;
+              }
+            } catch {
+              // content is not JSON, try splitting by newlines
+              const lines = data.content.split("\n").map((l: string) => l.trim()).filter((l: string) => l.startsWith("http"));
+              if (lines.length > 0) {
+                setHeroImages(lines);
+                return;
+              }
+            }
+          }
+          // Fall back to single image field
+          if (data.image) {
+            setHeroImages([data.image]);
+          }
+        }
+      } catch {
+        // Use fallback images
+      }
+    };
+    fetchHeroImages();
+  }, []);
+
+  // Auto-slide timer
+  useEffect(() => {
+    if (heroImages.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, SLIDE_DURATION);
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -107,17 +162,40 @@ export default function HeroSection() {
       ref={heroRef}
       className="relative min-h-screen flex items-center overflow-hidden"
     >
-      {/* Background */}
+      {/* Animated Sliding Background */}
       <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80')",
-          }}
-        />
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('${heroImages[currentSlide]}')`,
+            }}
+          />
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-r from-secondary/95 via-secondary/80 to-secondary/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-transparent to-transparent" />
+
+        {/* Slide Indicators */}
+        {heroImages.length > 1 && (
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            {heroImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  index === currentSlide
+                    ? "w-8 bg-primary"
+                    : "w-3 bg-white/40 hover:bg-white/60"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Decorative Elements */}

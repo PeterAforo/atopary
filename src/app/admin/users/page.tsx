@@ -8,6 +8,18 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
+const PERMISSIONS = [
+  { key: "manage_properties", label: "Manage Properties", desc: "Approve, edit, delete listings" },
+  { key: "manage_users", label: "Manage Users", desc: "Edit user accounts and roles" },
+  { key: "manage_mortgages", label: "Manage Mortgages", desc: "Review and process applications" },
+  { key: "manage_inquiries", label: "Manage Inquiries", desc: "Respond to and manage inquiries" },
+  { key: "manage_messages", label: "Manage Messages", desc: "View and reply to contact messages" },
+  { key: "manage_cms", label: "Manage CMS", desc: "Edit pages, sections, and content" },
+  { key: "manage_settings", label: "Manage Settings", desc: "Change site settings" },
+  { key: "manage_testimonials", label: "Manage Testimonials", desc: "Add, edit, delete testimonials" },
+  { key: "manage_newsletter", label: "Manage Newsletter", desc: "Send newsletters, manage subscribers" },
+];
+
 const emptyCreate = { name: "", email: "", password: "", phone: "", role: "BUYER" };
 
 export default function AdminUsersPage() {
@@ -23,7 +35,7 @@ export default function AdminUsersPage() {
   const [createSaving, setCreateSaving] = useState(false);
   const [createError, setCreateError] = useState("");
   const [editModal, setEditModal] = useState<any>(null);
-  const [editForm, setEditForm] = useState({ name: "", phone: "", role: "", isActive: true });
+  const [editForm, setEditForm] = useState({ name: "", phone: "", role: "", isActive: true, permissions: [] as string[] });
   const [editSaving, setEditSaving] = useState(false);
   const [toast, setToast] = useState("");
 
@@ -101,7 +113,16 @@ export default function AdminUsersPage() {
   // ─── Edit user ─────────────────────────────────────────────
   const openEdit = (u: any) => {
     setEditModal(u);
-    setEditForm({ name: u.name, phone: u.phone || "", role: u.role, isActive: u.isActive });
+    setEditForm({ name: u.name, phone: u.phone || "", role: u.role, isActive: u.isActive, permissions: u.permissions || [] });
+  };
+
+  const togglePermission = (key: string) => {
+    setEditForm(prev => ({
+      ...prev,
+      permissions: prev.permissions.includes(key)
+        ? prev.permissions.filter(p => p !== key)
+        : [...prev.permissions, key],
+    }));
   };
 
   const handleEditSave = async () => {
@@ -243,6 +264,7 @@ export default function AdminUsersPage() {
                   <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">User</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Role</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Permissions</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Properties</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Joined</th>
                   <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Actions</th>
@@ -280,6 +302,28 @@ export default function AdminUsersPage() {
                       }`}>
                         {user.isActive ? "Active" : "Inactive"}
                       </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      {user.role === "ADMIN" ? (
+                        user.permissions?.length > 0 ? (
+                          <div className="flex flex-wrap gap-1 max-w-[200px]">
+                            {user.permissions.slice(0, 3).map((p: string) => (
+                              <span key={p} className="px-1.5 py-0.5 text-[10px] font-medium bg-blue-50 text-blue-700 rounded">
+                                {p.replace("manage_", "").replace("_", " ")}
+                              </span>
+                            ))}
+                            {user.permissions.length > 3 && (
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600 rounded">
+                                +{user.permissions.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded">Full Access</span>
+                        )
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-4 text-sm text-muted-foreground">{user._count?.properties || 0}</td>
                     <td className="px-4 py-4 text-sm text-muted-foreground">{formatDate(user.createdAt)}</td>
@@ -388,7 +432,7 @@ export default function AdminUsersPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setEditModal(null)}>
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+              className="bg-white rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-secondary">Edit User</h3>
                 <button onClick={() => setEditModal(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
@@ -423,6 +467,37 @@ export default function AdminUsersPage() {
                     </select>
                   </div>
                 </div>
+
+                {/* Staff Permissions - only for ADMIN role */}
+                {editForm.role === "ADMIN" && (
+                  <div>
+                    <label className="block text-sm font-medium text-secondary mb-2">
+                      Staff Permissions
+                      <span className="text-xs text-muted-foreground font-normal ml-1">(leave all unchecked for full access)</span>
+                    </label>
+                    <div className="bg-muted rounded-xl p-3 space-y-2">
+                      {PERMISSIONS.map(perm => (
+                        <label key={perm.key}
+                          className={`flex items-start gap-3 p-2.5 rounded-lg cursor-pointer transition-colors ${
+                            editForm.permissions.includes(perm.key) ? "bg-blue-50 border border-blue-200" : "hover:bg-white border border-transparent"
+                          }`}>
+                          <input type="checkbox" checked={editForm.permissions.includes(perm.key)}
+                            onChange={() => togglePermission(perm.key)}
+                            className="w-4 h-4 rounded border-gray-300 text-primary mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-secondary">{perm.label}</p>
+                            <p className="text-xs text-muted-foreground">{perm.desc}</p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {editForm.permissions.length === 0
+                        ? "This admin has full access to all modules."
+                        : `This admin can only access: ${editForm.permissions.map(p => p.replace("manage_", "")).join(", ")}`}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex gap-3 mt-6">
                 <button onClick={() => setEditModal(null)}

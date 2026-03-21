@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   Building2, Search, Eye, CheckCircle, XCircle, Trash2,
-  Loader2, ChevronLeft, ChevronRight, Edit2, X, Save, Star, StarOff, Archive,
+  Loader2, ChevronLeft, ChevronRight, Edit2, X, Star, StarOff, Archive, Plus,
 } from "lucide-react";
 import { formatCurrency, getPropertyTypeLabel, getStatusColor, formatDate } from "@/lib/utils";
 
@@ -17,9 +17,6 @@ export default function AdminPropertiesPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
-  const [editModal, setEditModal] = useState<any>(null);
-  const [editForm, setEditForm] = useState({ title: "", price: "", status: "", type: "", isFeatured: false });
-  const [editSaving, setEditSaving] = useState(false);
   const [toast, setToast] = useState("");
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
@@ -75,34 +72,6 @@ export default function AdminPropertiesPage() {
     } catch (error) { console.error("Error:", error); }
   };
 
-  // ─── Edit modal ─────────────────────────────────────────────
-  const openEdit = (p: any) => {
-    setEditModal(p);
-    setEditForm({
-      title: p.title, price: String(p.price), status: p.status,
-      type: p.type, isFeatured: p.isFeatured,
-    });
-  };
-
-  const handleEditSave = async () => {
-    if (!editModal) return;
-    setEditSaving(true);
-    try {
-      const res = await fetch(`/api/properties/${editModal.id}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: editForm.title,
-          price: parseFloat(editForm.price),
-          status: editForm.status,
-          type: editForm.type,
-          isFeatured: editForm.isFeatured,
-        }),
-      });
-      if (res.ok) { setEditModal(null); fetchProperties(pagination.page); showToast("Property updated"); }
-    } catch (error) { console.error("Error:", error); }
-    finally { setEditSaving(false); }
-  };
-
   // ─── Bulk actions ───────────────────────────────────────────
   const toggleSelect = (id: string) => {
     setSelected(prev => {
@@ -149,6 +118,10 @@ export default function AdminPropertiesPage() {
           <h2 className="text-2xl font-bold text-secondary">Properties Management</h2>
           <p className="text-sm text-muted-foreground">Manage, approve, and edit property listings ({pagination.total} total)</p>
         </div>
+        <Link href="/admin/properties/add"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary-dark transition-all">
+          <Plus className="w-4 h-4" /> Add Property
+        </Link>
       </div>
 
       {/* Filters */}
@@ -272,10 +245,10 @@ export default function AdminPropertiesPage() {
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" target="_blank" title="View">
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <button onClick={() => openEdit(property)}
+                        <Link href={`/admin/properties/${property.id}/edit`}
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
                           <Edit2 className="w-4 h-4" />
-                        </button>
+                        </Link>
                         {property.status === "PENDING" && (
                           <>
                             <button onClick={() => handleStatusChange(property.id, "APPROVED")}
@@ -321,71 +294,6 @@ export default function AdminPropertiesPage() {
         )}
       </div>
 
-      {/* Edit Modal */}
-      <AnimatePresence>
-        {editModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setEditModal(null)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-secondary">Edit Property</h3>
-                <button onClick={() => setEditModal(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">Title</label>
-                  <input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-sm" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-secondary mb-1">Price (GH₵)</label>
-                    <input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-secondary mb-1">Type</label>
-                    <select value={editForm.type} onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-sm">
-                      {["HOUSE", "APARTMENT", "CONDO", "TOWNHOUSE", "VILLA", "LAND", "COMMERCIAL", "OFFICE"].map(t => (
-                        <option key={t} value={t}>{t}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">Status</label>
-                  <select value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-sm">
-                    {["PENDING", "APPROVED", "REJECTED", "SOLD", "ARCHIVED"].map(s => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={editForm.isFeatured}
-                    onChange={(e) => setEditForm({ ...editForm, isFeatured: e.target.checked })}
-                    className="w-4 h-4 rounded border-border text-primary" />
-                  <span className="text-sm text-secondary">Featured property</span>
-                </label>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button onClick={() => setEditModal(null)}
-                  className="flex-1 py-2.5 bg-gray-100 text-secondary rounded-xl font-semibold hover:bg-gray-200 transition-all text-sm">
-                  Cancel
-                </button>
-                <button onClick={handleEditSave} disabled={editSaving || !editForm.title}
-                  className="flex-1 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50">
-                  {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Save Changes
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { motion } from "framer-motion";
 import {
   Mail, MailOpen, Trash2, Loader2, Search, Eye, Calendar, User,
@@ -65,7 +64,6 @@ export default function AdminMessagesPage() {
   const unreadCount = messages.filter((m) => !m.isRead).length;
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -195,6 +193,5 @@ export default function AdminMessagesPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 }

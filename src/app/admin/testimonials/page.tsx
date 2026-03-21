@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Star, Plus, Edit2, Trash2, Loader2, X, CheckCircle, Save, Eye, EyeOff,
@@ -96,7 +95,7 @@ export default function AdminTestimonialsPage() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -266,6 +265,6 @@ export default function AdminTestimonialsPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </DashboardLayout>
+    </>
   );
 }

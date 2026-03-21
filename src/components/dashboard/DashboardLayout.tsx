@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Building2, Users, MessageSquare, Calculator,
   FileText, Settings, LogOut, Menu, X, ChevronDown, Bell,
   Home, ShoppingBag, PlusCircle, BarChart3, Globe, Layers,
-  Mail, Star, UserPlus, Loader2,
+  Mail, Star, UserPlus, Loader2, Send, Share2,
 } from "lucide-react";
 
 interface NavItem {
@@ -31,6 +31,8 @@ const navItems: Record<string, NavItem[]> = {
     { label: "CMS Sections", href: "/admin/sections", icon: Layers },
     { label: "Testimonials", href: "/admin/testimonials", icon: Star },
     { label: "Messages", href: "/admin/messages", icon: Mail },
+    { label: "Newsletter", href: "/admin/newsletter", icon: Send },
+    { label: "Social Media", href: "/admin/social-media", icon: Share2 },
     { label: "Settings", href: "/admin/settings", icon: Settings },
   ],
   SELLER: [
