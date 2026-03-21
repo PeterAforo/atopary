@@ -3,12 +3,22 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   Building2, Users, MessageSquare, Calculator, TrendingUp,
   ArrowUpRight, ArrowDownRight, Eye, DollarSign, Clock,
-  CheckCircle, XCircle, Loader2,
+  CheckCircle, XCircle, Loader2, Map,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+
+const PropertyMap = dynamic(() => import("@/components/admin/PropertyMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[500px] rounded-2xl bg-muted flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+    </div>
+  ),
+});
 
 interface RecentProperty {
   id: string;
@@ -164,6 +174,33 @@ export default function AdminDashboard() {
             </Link>
           ))}
         </div>
+      </motion.div>
+
+      {/* Property Map */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45 }}
+        className="bg-white rounded-2xl p-6 border border-border"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Map className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-secondary">Property Map</h2>
+              <p className="text-xs text-muted-foreground">All properties with GPS data across Ghana</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-xs">
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-500" /> Approved</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-yellow-500" /> Pending</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Rejected</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-400" /> Sold</span>
+          </div>
+        </div>
+        <PropertyMap />
       </motion.div>
 
       {/* Recent Activity */}

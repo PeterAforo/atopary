@@ -65,6 +65,7 @@ export async function PUT(
       "title", "description", "price", "address", "city", "state", "zipCode",
       "country", "type", "status", "bedrooms", "bathrooms", "area", "yearBuilt",
       "parking", "furnished", "features", "virtualTour", "isFeatured",
+      "latitude", "longitude",
     ];
     const data: Record<string, unknown> = {};
     for (const key of allowedFields) {

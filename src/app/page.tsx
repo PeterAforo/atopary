@@ -6,6 +6,7 @@ import ServicesSection from "@/components/home/ServicesSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import NewsletterSection from "@/components/home/NewsletterSection";
+import NearMeSection from "@/components/home/NearMeSection";
 
 export default function HomePage() {
   return (
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Navbar />
       <HeroSection />
       <FeaturedProperties />
+      <NearMeSection />
       <ServicesSection />
       <HowItWorks />
       <TestimonialsSection />

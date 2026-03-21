@@ -104,6 +104,8 @@ export async function POST(request: Request) {
       furnished,
       features,
       virtualTour,
+      latitude,
+      longitude,
       images,
       videos,
     } = body;
@@ -134,6 +136,8 @@ export async function POST(request: Request) {
         furnished: Boolean(furnished),
         features: features || [],
         virtualTour: virtualTour || null,
+        latitude: latitude ? parseFloat(latitude) : null,
+        longitude: longitude ? parseFloat(longitude) : null,
         sellerId: session.user.id,
         status: session.user.role === "ADMIN" ? "APPROVED" : "PENDING",
         images: images?.length

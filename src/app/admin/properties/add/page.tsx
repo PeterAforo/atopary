@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Save, Loader2, Plus, X, ImageIcon,
   Building2, MapPin, DollarSign, Bed, Bath, Maximize,
-  Car, Calendar, Star, Layers, Video, Globe,
+  Car, Calendar, Star, Layers, Video, Globe, Navigation, Crosshair,
 } from "lucide-react";
 
 const PROPERTY_TYPES = [
@@ -62,7 +62,12 @@ export default function AdminAddPropertyPage() {
     isFeatured: false,
     features: [] as string[],
     virtualTour: "",
+    latitude: "",
+    longitude: "",
   });
+
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsError, setGpsError] = useState("");
 
   const [images, setImages] = useState<{ url: string; alt: string }[]>([]);
   const [newImageUrl, setNewImageUrl] = useState("");
@@ -83,6 +88,27 @@ export default function AdminAddPropertyPage() {
         ? prev.features.filter(f => f !== feature)
         : [...prev.features, feature],
     }));
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setGpsError("Geolocation is not supported by your browser");
+      return;
+    }
+    setGpsLoading(true);
+    setGpsError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        updateField("latitude", String(position.coords.latitude));
+        updateField("longitude", String(position.coords.longitude));
+        setGpsLoading(false);
+      },
+      (err) => {
+        setGpsError(err.message || "Failed to get location");
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const addImage = () => {
@@ -246,6 +272,40 @@ export default function AdminAddPropertyPage() {
               <input value={form.country} onChange={e => updateField("country", e.target.value)}
                 className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-sm" />
             </div>
+          </div>
+
+          {/* GPS Coordinates */}
+          <div className="mt-4 p-4 bg-blue-50/50 border border-blue-200 rounded-xl">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Crosshair className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-secondary">GPS Coordinates</span>
+                <span className="text-xs text-muted-foreground">(helps buyers find exact location)</span>
+              </div>
+              <button type="button" onClick={getCurrentLocation} disabled={gpsLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all disabled:opacity-50">
+                {gpsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
+                {gpsLoading ? "Getting Location..." : "Get Current Location"}
+              </button>
+            </div>
+            {gpsError && <p className="text-xs text-red-500 mb-2">{gpsError}</p>}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-secondary mb-1">Latitude</label>
+                <input type="number" step="any" value={form.latitude} onChange={e => updateField("latitude", e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white border border-border rounded-lg text-sm" placeholder="e.g. 5.6037" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-secondary mb-1">Longitude</label>
+                <input type="number" step="any" value={form.longitude} onChange={e => updateField("longitude", e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white border border-border rounded-lg text-sm" placeholder="e.g. -0.1870" />
+              </div>
+            </div>
+            {form.latitude && form.longitude && (
+              <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> Location set: {parseFloat(form.latitude).toFixed(6)}, {parseFloat(form.longitude).toFixed(6)}
+              </p>
+            )}
           </div>
         </div>
       </div>
