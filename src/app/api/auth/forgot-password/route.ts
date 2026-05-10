@@ -3,6 +3,7 @@ import crypto from "crypto";
 import prisma from "@/lib/db";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 import logger from "@/lib/logger";
+import { emailService } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -42,8 +43,9 @@ export async function POST(request: Request) {
       data: { token, email, expiresAt },
     });
 
-    // In production, send this link via email. For now, return the token in development.
+    // Send password reset email
     const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
+    await emailService.sendPasswordReset(email, resetUrl);
 
     if (process.env.NODE_ENV === "development") {
       return NextResponse.json({
@@ -52,8 +54,6 @@ export async function POST(request: Request) {
         _dev: { resetUrl, token },
       });
     }
-
-    // TODO: Integrate email service (SendGrid, Resend, etc.) to send resetUrl to user
     return NextResponse.json({
       message: "If an account with that email exists, a reset link has been generated.",
     });

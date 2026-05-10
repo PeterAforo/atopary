@@ -1,0 +1,23 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "NEXTAUTH_URL": {
+      "description": "The canonical URL of your site",
+      "value": "https://your-app-domain.vercel.app"
+    }
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_APP_URL": "https://your-app-domain.vercel.app"
+    }
+  },
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}

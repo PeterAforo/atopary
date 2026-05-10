@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import logger from "@/lib/logger";
+import { emailService } from "@/lib/email";
 
 export async function PUT(
   request: Request,
@@ -18,6 +19,12 @@ export async function PUT(
     const body = await request.json();
     const { status, adminNotes } = body;
 
+    // Get current mortgage application to have email for notification
+    const currentMortgage = await prisma.mortgageApplication.findUnique({
+      where: { id },
+      select: { email: true }
+    });
+
     const updated = await prisma.mortgageApplication.update({
       where: { id },
       data: {
@@ -25,6 +32,15 @@ export async function PUT(
         ...(adminNotes !== undefined && { adminNotes }),
       },
     });
+
+    // Send email notification if status changed
+    if (status && currentMortgage?.email) {
+      await emailService.sendMortgageStatusUpdate(
+        currentMortgage.email,
+        status,
+        adminNotes
+      );
+    }
 
     return NextResponse.json(updated);
   } catch (error) {

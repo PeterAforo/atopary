@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import logger from "@/lib/logger";
+import { emailService } from "@/lib/email";
 
 export async function PUT(
   request: Request,
@@ -20,7 +21,10 @@ export async function PUT(
 
     const inquiry = await prisma.inquiry.findUnique({
       where: { id },
-      include: { property: { select: { sellerId: true } } },
+      include: { 
+        property: { select: { sellerId: true, title: true } },
+        buyer: { select: { name: true, email: true } }
+      },
     });
 
     if (!inquiry) {
@@ -39,6 +43,16 @@ export async function PUT(
         ...(status !== undefined && { status }),
       },
     });
+
+    // Send email notification to buyer if response is provided
+    if (response && inquiry.buyer?.email) {
+      await emailService.sendInquiryResponse(
+        inquiry.buyer.email,
+        inquiry.property.title,
+        session.user.name,
+        response
+      );
+    }
 
     return NextResponse.json(updated);
   } catch (error) {

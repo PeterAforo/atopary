@@ -6,6 +6,7 @@ import { z } from "zod";
 import { registerSchema } from "@/lib/validations";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 import logger from "@/lib/logger";
+import { emailService } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -62,7 +63,9 @@ export async function POST(request: Request) {
 
     const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?email=${encodeURIComponent(validated.email)}`;
 
-    // TODO: Integrate email service (SendGrid, Resend, etc.) to send OTP to user
+    // Send verification email
+    await emailService.sendEmailVerification(validated.email, otp);
+
     // For now, return OTP in development mode
     const response: Record<string, unknown> = {
       message: "Account created. Please verify your email with the OTP sent to your inbox.",

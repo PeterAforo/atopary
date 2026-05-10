@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, Loader2 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,36 +17,26 @@ interface Testimonial {
   avatar: string | null;
 }
 
-const fallbackTestimonials: Testimonial[] = [
-  {
-    name: "Kwame Asante",
-    role: "Property Buyer",
-    content:
-      "Atopary made finding our dream home an absolute breeze. The virtual tours saved us so much time, and the mortgage calculator helped us plan our finances perfectly.",
-    rating: 5,
-    avatar: null,
-  },
-  {
-    name: "Ama Mensah",
-    role: "Property Seller",
-    content:
-      "I listed my property and within weeks, Atopary connected me with serious buyers. The process was transparent, professional, and hassle-free.",
-    rating: 5,
-    avatar: null,
-  },
-  {
-    name: "Joseph Owusu",
-    role: "Real Estate Investor",
-    content:
-      "As an investor, I rely on Atopary for market insights and verified listings. Their platform has been instrumental in growing my property portfolio.",
-    rating: 5,
-    avatar: null,
-  },
-];
-
 export default function TestimonialsSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await fetch("/api/testimonials?limit=6");
+        const data = await res.json();
+        setTestimonials(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch testimonials:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
 
   useEffect(() => {
     fetch("/api/testimonials")
@@ -91,8 +81,13 @@ export default function TestimonialsSection() {
           </h2>
         </div>
 
-        <div className="testimonials-grid grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
+        {loading ? (
+          <div className="flex justify-center items-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="testimonials-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
               className="testimonial-card"

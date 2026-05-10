@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { sanitizeText } from "@/lib/sanitize";
 import logger from "@/lib/logger";
+import { emailService } from "@/lib/email";
 
 export async function GET(request: Request) {
   try {
@@ -72,6 +73,9 @@ export async function POST(request: Request) {
 
     const property = await prisma.property.findUnique({
       where: { id: propertyId },
+      include: {
+        seller: { select: { id: true, name: true, email: true } },
+      },
     });
 
     if (!property) {
@@ -89,6 +93,14 @@ export async function POST(request: Request) {
         property: { select: { id: true, title: true } },
       },
     });
+
+    // Send email notification to property seller
+    await emailService.sendInquiryNotification(
+      property.seller.email,
+      property.title,
+      session.user.name,
+      message
+    );
 
     return NextResponse.json(inquiry, { status: 201 });
   } catch (error) {

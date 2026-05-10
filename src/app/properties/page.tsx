@@ -24,6 +24,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { formatCurrency, getPropertyTypeLabel } from "@/lib/utils";
+import PropertyCard from "@/components/PropertyCard";
+import SearchAutocomplete from "@/components/SearchAutocomplete";
 
 const propertyTypes = [
   { label: "All Types", value: "" },
@@ -114,14 +116,11 @@ function PropertiesContent() {
             className="mt-8 max-w-4xl mx-auto"
           >
             <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1 flex items-center gap-3 bg-white rounded-xl px-4 py-3">
-                <Search className="w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search by location, property name..."
-                  className="w-full bg-transparent text-secondary placeholder:text-gray-400 text-sm focus:outline-none"
+              <SearchAutocomplete
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={setSearch}
+                  onSearch={handleSearch}
+                  className="flex-1"
                 />
               </div>
               <select
@@ -299,84 +298,12 @@ function PropertiesContent() {
               }
             >
               {properties.map((property: any, index: number) => (
-                <motion.div
-                  key={property.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Link href={`/properties/${property.slug}`}>
-                    <div
-                      className={`bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-500 group ${
-                        viewMode === "list" ? "flex" : ""
-                      }`}
-                    >
-                      <div
-                        className={`relative overflow-hidden ${
-                          viewMode === "list" ? "w-80 h-56" : "h-64"
-                        }`}
-                      >
-                        {property.images?.[0]?.url ? (
-                          <Image
-                            src={property.images[0].url}
-                            alt={property.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <Building2 className="w-12 h-12 text-gray-400" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                        <div className="absolute top-4 left-4">
-                          <span className="px-3 py-1 bg-white/90 text-secondary text-xs font-semibold rounded-lg backdrop-blur-sm">
-                            {getPropertyTypeLabel(property.type)}
-                          </span>
-                        </div>
-                        <div className="absolute bottom-4 left-4">
-                          <span className="text-2xl font-bold text-white">
-                            {formatCurrency(property.price)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-6 flex-1">
-                        <h3 className="text-lg font-bold text-secondary group-hover:text-primary transition-colors line-clamp-1">
-                          {property.title}
-                        </h3>
-                        <div className="flex items-center gap-1 mt-2 text-muted-foreground">
-                          <MapPin className="w-4 h-4 text-primary" />
-                          <span className="text-sm">
-                            {property.address}, {property.city}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100">
-                          {property.bedrooms > 0 && (
-                            <div className="flex items-center gap-1.5">
-                              <Bed className="w-4 h-4 text-primary" />
-                              <span className="text-sm text-muted-foreground">
-                                {property.bedrooms} Beds
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-1.5">
-                            <Bath className="w-4 h-4 text-primary" />
-                            <span className="text-sm text-muted-foreground">
-                              {property.bathrooms} Baths
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Maximize className="w-4 h-4 text-primary" />
-                            <span className="text-sm text-muted-foreground">
-                              {property.area} m²
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                <PropertyCard 
+                  key={property.id} 
+                  property={property} 
+                  viewMode={viewMode} 
+                  index={index} 
+                />
               ))}
             </div>
           )}
